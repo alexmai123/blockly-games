@@ -477,6 +477,7 @@ Maze.init = function() {
        'rtl': rtl,
        'trashcan': true,
        'zoom': {'startScale': scale}});
+
   BlocklyInterface.workspace.getAudioManager().load(Maze.SKIN.winSound, 'win');
   BlocklyInterface.workspace.getAudioManager().load(Maze.SKIN.crashSound, 'fail');
   // Not really needed, there are no user-defined functions or variables.
@@ -485,8 +486,7 @@ Maze.init = function() {
 
   var defaultXml =
       '<xml>' +
-        '<block movable="' + (BlocklyGames.LEVEL != 1) + '" ' +
-        'type="maze_moveForward" x="70" y="70"></block>' +
+        '<block type="move_north"></block>' +
       '</xml>';
   BlocklyInterface.loadBlocks(defaultXml, false);
 
@@ -986,6 +986,12 @@ Maze.initInterpreter = function(interpreter, globalObject) {
     return Maze.notDone();
   };
   interpreter.setProperty(globalObject, 'notDone',
+      interpreter.createNativeFunction(wrapper));
+  // new added: north, east, south, west
+  wrapper = function(id){
+    return Maze.log.push(['north', id]);
+  }
+  interpreter.setProperty(globalObject, 'moveNorth', 
       interpreter.createNativeFunction(wrapper));
 };
 

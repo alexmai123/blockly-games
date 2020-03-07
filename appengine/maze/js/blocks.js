@@ -67,6 +67,24 @@ Blockly.JavaScript['maze_moveForward'] = function(block) {
   return 'moveForward(\'block_id_' + block.id + '\');\n';
 };
 
+
+Blockly.Blocks['move_north'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": 'north',
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": Maze.Blocks.MOVEMENT_HUE,
+      "tooltip": 'cnm'
+    });
+  }
+}
+
+Blockly.JavaScript['move_north'] = function(block) {
+  // Generate JavaScript for moving forward.
+  return 'moveNorth(\'block_id_' + block.id + '\');\n';
+}
+
 Blockly.Blocks['maze_turn'] = {
   /**
    * Block for turning left or right.
