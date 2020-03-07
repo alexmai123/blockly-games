@@ -51,7 +51,7 @@ Maze.CRASH_SPIN = 2;
 Maze.CRASH_FALL = 3;
 
 Maze.SKINS = [
-  // sprite: A 1029x51 set of 21 avatar images.
+  // sprite: A 1029x51 set of 21 avatar images. updated: 43x42 with 1 avatar image
   // tiles: A 250x200 set of 20 map images.
   // marker: A 20x34 goal image.
   // background: An optional 400x450 background image, or false.
@@ -60,7 +60,7 @@ Maze.SKINS = [
   // crashSound: List of sounds (in various formats) for player crashes.
   // crashType: Behaviour when player crashes (stop, spin, or fall).
   {
-    sprite: 'maze/pegman.png',
+    sprite: 'maze/xiaoc.png',
     tiles: 'maze/tiles_pegman.png',
     marker: 'maze/marker.png',
     background: false,
@@ -119,11 +119,11 @@ Maze.map = [
  undefined,
 // Level 1.
  [[0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 2, 1, 3, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0],
+  [0, 1, 1, 1, 1, 1, 0],
+  [0, 1, 1, 1, 1, 1, 0],
+  [0, 1, 1, 1, 1, 1, 0],
+  [0, 1, 2, 3, 1, 3, 0],
+  [0, 1, 1, 1, 1, 1, 0],
   [0, 0, 0, 0, 0, 0, 0]],
 // Level 2.
  [[0, 0, 0, 0, 0, 0, 0, 0],
@@ -223,8 +223,8 @@ Maze.map = [
 Maze.ROWS = Maze.map.length;
 Maze.COLS = Maze.map[0].length;
 Maze.SQUARE_SIZE = 50;
-Maze.PEGMAN_HEIGHT = 52;
-Maze.PEGMAN_WIDTH = 49;
+Maze.PEGMAN_HEIGHT = 43;
+Maze.PEGMAN_WIDTH = 42;
 
 Maze.MAZE_WIDTH = Maze.SQUARE_SIZE * Maze.COLS;
 Maze.MAZE_HEIGHT = Maze.SQUARE_SIZE * Maze.ROWS;
@@ -333,7 +333,7 @@ Maze.drawMap = function() {
     return (Maze.map[y][x] == Maze.SquareType.WALL) ? '0' : '1';
   };
 
-  // Compute and draw the tile for each square.
+  // Compute and draw the tile for each square. (Check each direction)
   var tileId = 0;
   for (var y = 0; y < Maze.ROWS; y++) {
     for (var x = 0; x < Maze.COLS; x++) {
@@ -348,10 +348,10 @@ Maze.drawMap = function() {
       if (!Maze.tile_SHAPES[tileShape]) {
         // Empty square.  Use null0 for large areas, with null1-4 for borders.
         // Add some randomness to avoid large empty spaces.
-        if (tileShape == '00000' && Math.random() > 0.3) {
+        if (tileShape == '00000') {
           tileShape = 'null0';
         } else {
-          tileShape = 'null' + Math.floor(1 + Math.random() * 4);
+          tileShape = 'null0';
         }
       }
       var left = Maze.tile_SHAPES[tileShape][0];
@@ -381,13 +381,15 @@ Maze.drawMap = function() {
   }
 
   // Add finish marker.
-  var finishMarker = Blockly.utils.dom.createSvgElement('image', {
-      'id': 'finish',
+  for (var i = 0; i < Maze.numFinish; i++){
+    var finishMarker = Blockly.utils.dom.createSvgElement('image', {
+      'id': 'finish' + i,
       'height': 34,
       'width': 20
     }, svg);
-  finishMarker.setAttributeNS(Blockly.utils.dom.XLINK_NS, 'xlink:href',
-      Maze.SKIN.marker);
+    finishMarker.setAttributeNS(Blockly.utils.dom.XLINK_NS, 'xlink:href',
+        Maze.SKIN.marker);
+  }
 
   // Pegman's clipPath element, whose (x, y) is reset by Maze.displayPegman
   var pegmanClip = Blockly.utils.dom.createSvgElement('clipPath', {
@@ -403,7 +405,7 @@ Maze.drawMap = function() {
   var pegmanIcon = Blockly.utils.dom.createSvgElement('image', {
       'id': 'pegman',
       'height': Maze.PEGMAN_HEIGHT,
-      'width': Maze.PEGMAN_WIDTH * 21, // 49 * 21 = 1029
+      'width': Maze.PEGMAN_WIDTH, // 49 * 21 = 1029
       'clip-path': 'url(#pegmanClipPath)'
     }, svg);
   pegmanIcon.setAttributeNS(Blockly.utils.dom.XLINK_NS, 'xlink:href',
@@ -481,8 +483,6 @@ Maze.init = function() {
   Blockly.JavaScript.addReservedWords('moveForward,moveBackward,' +
       'turnRight,turnLeft,isPathForward,isPathRight,isPathBackward,isPathLeft');
 
-  Maze.drawMap();
-
   var defaultXml =
       '<xml>' +
         '<block movable="' + (BlocklyGames.LEVEL != 1) + '" ' +
@@ -491,15 +491,19 @@ Maze.init = function() {
   BlocklyInterface.loadBlocks(defaultXml, false);
 
   // Locate the start and finish squares.
+  Maze.finish_ = [];
   for (var y = 0; y < Maze.ROWS; y++) {
     for (var x = 0; x < Maze.COLS; x++) {
       if (Maze.map[y][x] == Maze.SquareType.START) {
         Maze.start_ = {x: x, y: y};
       } else if (Maze.map[y][x] == Maze.SquareType.FINISH) {
-        Maze.finish_ = {x: x, y: y};
+        Maze.finish_.push({x: x, y: y});
       }
     }
   }
+  Maze.numFinish = Maze.finish_.length;
+
+  Maze.drawMap();
 
   Maze.reset(true);
   BlocklyInterface.workspace.addChangeListener(function() {Maze.updateCapacity();});
@@ -808,6 +812,12 @@ Maze.reset = function(first) {
   Maze.pegmanX = Maze.start_.x;
   Maze.pegmanY = Maze.start_.y;
 
+  // reset number of Finish Marker into full
+  Maze.numFinish = Maze.finish_.length;
+
+  // reset all finish marker
+  Maze.resetFinishMarker();
+
   if (first) {
     // Opening animation.
     Maze.pegmanD = Maze.startDirection + 1;
@@ -824,11 +834,13 @@ Maze.reset = function(first) {
   }
 
   // Move the finish icon into position.
-  var finishIcon = document.getElementById('finish');
-  finishIcon.setAttribute('x', Maze.SQUARE_SIZE * (Maze.finish_.x + 0.5) -
-      finishIcon.getAttribute('width') / 2);
-  finishIcon.setAttribute('y', Maze.SQUARE_SIZE * (Maze.finish_.y + 0.6) -
-      finishIcon.getAttribute('height'));
+  for (var i = 0; i < Maze.numFinish; i++){
+    var finishIcon = document.getElementById('finish' + i);
+    finishIcon.setAttribute('x', Maze.SQUARE_SIZE * (Maze.finish_[i].x + 0.5) -
+        finishIcon.getAttribute('width') / 2);
+    finishIcon.setAttribute('y', Maze.SQUARE_SIZE * (Maze.finish_[i].y + 0.6) -
+        finishIcon.getAttribute('height'));
+  }
 
   // Make 'look' icon invisible and promote to top.
   var lookIcon = document.getElementById('look');
@@ -1007,8 +1019,8 @@ Maze.execute = function() {
         throw Infinity;
       }
     }
-    Maze.result = Maze.notDone() ?
-        Maze.ResultType.FAILURE : Maze.ResultType.SUCCESS;
+    // Maze.result = Maze.notDone() ?
+    //     Maze.ResultType.FAILURE : Maze.ResultType.SUCCESS;
   } catch (e) {
     // A boolean is thrown for normal termination.
     // Abnormal termination is a user error.
@@ -1024,12 +1036,18 @@ Maze.execute = function() {
   }
 
   // Fast animation if execution is successful.  Slow otherwise.
-  if (Maze.result == Maze.ResultType.SUCCESS) {
-    Maze.stepSpeed = 100;
-    Maze.log.push(['finish', null]);
-  } else {
-    Maze.stepSpeed = 150;
-  }
+  // if (Maze.result == Maze.ResultType.SUCCESS) {
+  //   Maze.stepSpeed = 100;
+  //   Maze.log.push(['finish', null]);
+  // } else {
+  //   Maze.stepSpeed = 150;
+  // }
+
+  // add a check block to see if everything finished
+  Maze.log.push(['check', null]);
+
+  //default speed: 150ms
+  Maze.stepSpeed = 150;
 
   // Maze.log now contains a transcript of all the user's actions.
   // Reset the maze and animate the transcript.
@@ -1042,12 +1060,16 @@ Maze.execute = function() {
  */
 Maze.animate = function() {
   var action = Maze.log.shift();
+  // all actions being executed
   if (!action) {
     BlocklyInterface.highlight(null);
     Maze.levelHelp();
     return;
   }
   BlocklyInterface.highlight(action[1]);
+
+  // Check if touching the finish Marker
+  Maze.checkFinishMarker();
 
   switch (action[0]) {
     case 'north':
@@ -1098,11 +1120,16 @@ Maze.animate = function() {
                     [Maze.pegmanX, Maze.pegmanY, Maze.pegmanD * 4 + 4]);
       Maze.pegmanD = Maze.constrainDirection4(Maze.pegmanD + 1);
       break;
+    case 'check':
+      break;
     case 'finish':
       Maze.scheduleFinish(true);
       BlocklyInterface.saveToLocalStorage();
       setTimeout(BlocklyDialogs.congratulations, 1000);
   }
+
+  // if maze is finished then add the finish log to execute
+  if(!Maze.notDone()) Maze.log.push(['finish', null]);
 
   Maze.pidList.push(setTimeout(Maze.animate, Maze.stepSpeed * 5));
 };
@@ -1279,6 +1306,7 @@ Maze.scheduleFinish = function(sound) {
  * @param {number=} opt_angle Optional angle (in degrees) to rotate Pegman.
  */
 Maze.displayPegman = function(x, y, d, opt_angle) {
+  d = 0 // cancel offset for only one image of sprite
   var pegmanIcon = document.getElementById('pegman');
   pegmanIcon.setAttribute('x',
       x * Maze.SQUARE_SIZE - d * Maze.PEGMAN_WIDTH + 1);
@@ -1296,6 +1324,32 @@ Maze.displayPegman = function(x, y, d, opt_angle) {
   clipRect.setAttribute('x', x * Maze.SQUARE_SIZE + 1);
   clipRect.setAttribute('y', pegmanIcon.getAttribute('y'));
 };
+
+Maze.checkFinishMarker = function(){
+  for (var i = 0; i < Maze.finish_.length; i++){
+    if (Maze.pegmanX == Maze.finish_[i].x && Maze.pegmanY == Maze.finish_[i].y){
+      Maze.numFinish--;
+      Maze.deleteFinishMarker(i);
+      break;
+    }
+  }
+}
+
+Maze.resetFinishMarker = function(){
+  for (var i = 0; i < Maze.finish_.length; i++){
+    var Marker = document.getElementById('finish'+i);
+    Marker.setAttribute('xlink:href', Maze.SKIN.marker);
+  }
+}
+
+/**
+ * Display Pegman at the specified location, facing the specified direction.
+ * @param {number} idx Index of the finish Marker that need to be deleted.
+ */
+Maze.deleteFinishMarker = function(idx){
+  var changedFinishMarker = document.getElementById('finish'+idx);
+  changedFinishMarker.setAttribute('xlink:href', Maze.SKIN.sprite);
+}
 
 /**
  * Display the look icon at Pegman's current location,
@@ -1471,11 +1525,11 @@ Maze.isPath = function(direction, id) {
 };
 
 /**
- * Is the player at the finish marker?
+ * Is the player touching all finish markers?
  * @return {boolean} True if not done, false if done.
  */
 Maze.notDone = function() {
-  return Maze.pegmanX != Maze.finish_.x || Maze.pegmanY != Maze.finish_.y;
+  return Maze.numFinish != 0;
 };
 
 window.addEventListener('load', Maze.init);
