@@ -67,24 +67,6 @@ Blockly.JavaScript['maze_moveForward'] = function(block) {
   return 'moveForward(\'block_id_' + block.id + '\');\n';
 };
 
-
-Blockly.Blocks['move_north'] = {
-  init: function() {
-    this.jsonInit({
-      "message0": 'north',
-      "previousStatement": null,
-      "nextStatement": null,
-      "colour": Maze.Blocks.MOVEMENT_HUE,
-      "tooltip": 'cnm'
-    });
-  }
-}
-
-Blockly.JavaScript['move_north'] = function(block) {
-  // Generate JavaScript for moving forward.
-  return 'moveNorth(\'block_id_' + block.id + '\');\n';
-}
-
 Blockly.Blocks['maze_turn'] = {
   /**
    * Block for turning left or right.
@@ -208,3 +190,75 @@ Blockly.JavaScript['maze_forever'] = function(block) {
   }
   return 'while (notDone()) {\n' + branch + '}\n';
 };
+
+
+Blockly.Blocks['move_north'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": 'north',
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": Maze.Blocks.MOVEMENT_HUE,
+      "tooltip": 'cnm'
+    });
+  }
+}
+
+Blockly.JavaScript['move_north'] = function(block) {
+  // Generate JavaScript for moving forward.
+  return 'moveNorth(\'block_id_' + block.id + '\');\n';
+}
+
+
+Blockly.Blocks['move_south'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": 'south',
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": Maze.Blocks.MOVEMENT_HUE,
+      "tooltip": 'cnm'
+    });
+  }
+}
+
+Blockly.JavaScript['move_south'] = function(block) {
+  // Generate JavaScript for moving forward.
+  return 'moveSouth(\'block_id_' + block.id + '\');\n';
+}
+
+
+Blockly.Blocks['move_east'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": 'east',
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": Maze.Blocks.MOVEMENT_HUE,
+      "tooltip": 'cnm'
+    });
+  }
+}
+
+Blockly.JavaScript['move_east'] = function(block) {
+  // Generate JavaScript for moving forward.
+  return 'moveEast(\'block_id_' + block.id + '\');\n';
+}
+
+
+Blockly.Blocks['move_west'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": 'west',
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": Maze.Blocks.MOVEMENT_HUE,
+      "tooltip": 'cnm'
+    });
+  }
+}
+
+Blockly.JavaScript['move_west'] = function(block) {
+  // Generate JavaScript for moving forward.
+  return 'moveWest(\'block_id_' + block.id + '\');\n';
+}

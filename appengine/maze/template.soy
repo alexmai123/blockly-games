@@ -222,9 +222,10 @@
  */
 {template .toolbox}
   <xml id="toolbox" xmlns="https://developers.google.com/blockly/xml">
-    <block type="maze_moveForward"></block>
-    <block type="maze_turn"><field name="DIR">turnLeft</field></block>
-    <block type="maze_turn"><field name="DIR">turnRight</field></block>
+    <block type="move_north"></block>
+    <block type="move_south"></block>
+    <block type="move_east"></block>
+    <block type="move_west"></block>
     {if $ij.level > 2}
       <block type="maze_forever"></block>
       {if $ij.level == 6}
